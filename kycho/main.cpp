@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/02 23:07:09 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/03 06:39:14 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,20 @@ int main(int argc, char *argv[])
 	std::cout << loc->root << std::endl;
 	*/
 
+	HttpConfig* config;
 	try
 	{
-		HttpConfig config("./sample.conf");
+		config = new HttpConfig("./sample.conf");	
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 	}
-	
+
+	std::multimap<in_port_t, in_addr_t> must_listens = config->getMustListens();
+	for (std::multimap<in_port_t, in_addr_t>::iterator it = must_listens.begin(); it != must_listens.end(); it++){
+		std::cout << it->second << " " << it->first << std::endl; 
+	}	
 	
 
 	std::cout << "main 끝~~~" << std::endl;

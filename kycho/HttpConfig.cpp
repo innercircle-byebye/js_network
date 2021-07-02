@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 04:24:56 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/03 06:43:18 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,6 +278,27 @@ HttpConfig::HttpConfig(std::string configFilePath)
 	std::vector<std::vector<std::string> >::iterator server_it = servers_tokens.begin();
 	for (; server_it != servers_tokens.end(); server_it++){
 		Server *new_server = new Server(*server_it, this);
+
+		for (std::vector<std::string>::iterator i = new_server->listens.begin(); i != new_server->listens.end(); i++)
+		{
+			std::cout << "[" << *i << "] " << std::endl;
+
+			std::size_t pos = (*i).find(':');
+			std::string ip_addr_str = (*i).substr(0, pos);
+			std::string port_str = (*i).substr(pos + 1);
+
+			in_addr_t ip_addr = inet_addr(ip_addr_str.c_str());
+			in_port_t port = atoi(port_str.c_str());
+	
+			server[port][ip_addr].push_back(new_server);
+
+			if (must_listens.find(port)->second != inet_addr("0.0.0.0")){
+				if (ip_addr == inet_addr("0.0.0.0")){
+					must_listens.erase(port);
+				}
+				must_listens.insert(std::pair<in_port_t, in_addr_t>(port, ip_addr));
+			}		
+		}
 	}
 
 	print_status_for_debug();  // TODO : remove
@@ -286,5 +307,6 @@ HttpConfig::HttpConfig(std::string configFilePath)
 
 Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path)
 {
-	return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
+	//return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
+	return server[port][ip_addr][0]->locations[0];
 }
