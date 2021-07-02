@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:46:49 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 04:29:28 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/03 05:48:28 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,18 @@ public:
 
 	void print_status_for_debug(void){  // TODO : remove
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Server ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+
+		std::cout << "listen : ";
+		for (std::vector<std::string>::iterator i = this->listens.begin(); i != this->listens.end(); i++){
+			std::cout << *i << "  ";
+		}
+		std::cout << std::endl;
+
+		std::cout << "server_name : ";
+		for (std::vector<std::string>::iterator i = this->server_name.begin(); i != this->server_name.end(); i++){
+			std::cout << *i << "  ";
+		}
+		std::cout << std::endl;
 		
 		std::cout << "root : " << this->root << std::endl;
 		

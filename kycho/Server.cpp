@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 04:30:08 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/03 05:47:14 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 
 
 	// 초기화부분 
+	this->listens.push_back("0.0.0.0:80");
+	this->server_name.push_back("");
 	this->root = httpConfig->root;
 	this->index = httpConfig->index;
 	this->autoindex = httpConfig->autoindex;
@@ -26,6 +28,8 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 
 
 	// 한번이라도 세팅했었는지 체크하는 변수
+	bool check_listen_setting = false;
+	bool check_server_name_setting = false;
 	bool check_root_setting = false;
 	bool check_index_setting = false;
 	bool check_autoindex_setting = false;
@@ -42,23 +46,42 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 	{
 		if (*it == "listen")
 		{
-			while (*it != ";")
-			{
-				std::cout << "\t[" << *it << "] " << std::endl;
-				it++;
+			// TODO : 예외처리해야함 
+
+			if (check_listen_setting == false){
+				listens.clear();
+				check_listen_setting = true;
 			}
-			it++;
-			std::cout << std::endl;
+
+			std::string listen_value = *(it + 1);
+			
+			if (listen_value.find(':') == std::string::npos){
+				if (listen_value.find('.') == std::string::npos){
+					listen_value = "0.0.0.0:" + listen_value;
+				}else{
+					listen_value = listen_value + ":80";
+				}
+			}
+			listens.push_back(listen_value);
+			
+			it += 3;
 		}
 		else if (*it == "server_name")
 		{
+			// TODO : 예외처리해야함 
+
+			if (check_index_setting == false){
+				this->server_name.clear();
+				check_server_name_setting = true;
+			}
+
+			it++;
 			while (*it != ";")
 			{
-				std::cout << "\t[" << *it << "] " << std::endl;
+				this->server_name.push_back(*it);
 				it++;
 			}
 			it++;
-			std::cout << std::endl;
 		}
 		else if (*it == "root")
 		{
