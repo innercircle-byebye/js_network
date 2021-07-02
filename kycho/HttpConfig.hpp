@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:47:53 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/02 16:28:41 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/02 23:42:02 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <string>
 # include <arpa/inet.h>
 # include <fstream>
+# include <stdexcept>
 
 # include "Server.hpp"
 # include "Location.hpp"
@@ -32,7 +33,7 @@ public:
 	std::string									root;
 	std::vector<std::string>					index;
 	bool										autoindex;
-	int											client_max_body_size;
+	unsigned long long 							client_max_body_size;
 	std::map<int, std::string>					error_page;
 
 	std::map<in_port_t, std::map<in_addr_t, std::vector<Server*> > > server;
@@ -154,39 +155,67 @@ public:
 	
 	HttpConfig(std::string configFilePath)
 	{
+		// 초기화부분
+		this->root = "html";
+		this->index.push_back("index.html");
+
+
+		print_status_for_debug();  // TODO : remove
+
+		
+		// 한번이라도 세팅했었는지 체크하는 변수 
+		bool check_root_setting = false;
+		bool check_index_setting = false;
+
+		// config파일을 읽어서 content 변수에 담는다.
 		std::ifstream ifs(configFilePath);
 		std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-				
+		
+		// content를 유의미한 단위로 자른다.(토큰화한다)
 		ft::Tokenizer tokenizer;
 		std::vector<std::string> tokens = tokenizer.parse(content);
 	
-		std::vector<std::vector<std::string> > servers_tokens;
+		std::vector<std::vector<std::string> > servers_tokens;  // Server 객체 생성할떄 사용할 토큰들
 
 		std::vector<std::string>::iterator it = tokens.begin();
-		it++;
-		it++;
-	
+		
+		if (*it != "http")
+			throw std::runtime_error("webserv: [emerg] invalid number of arguments in \"" + (*it) + "\" directive");
+		if (*(it + 1) != "{")
+			throw std::runtime_error("webserv: [emerg] invalid number of arguments in \"http\" directive");
+
+		it += 2;
 		while (*it != "}")
 		{
 			if ( *it == "root"){
 
-				while (*it != ";")
-				{
-					std::cout << "[" << *it << "] " << std::endl;
-					it++;
-				}
-				it++;
-				std::cout << std::endl;
+				if (*(it + 1) == ";" || *(it + 2) != ";")
+					throw std::runtime_error("invalid number of arguments in \"root\" directive");
+				if (check_root_setting == true)
+					throw std::runtime_error("\"root\" directive is duplicate");
+
+				this->root = *(it + 1);
+				check_root_setting = true;
+				
+				it += 3;
 				
 			}else if (*it == "index"){
-				
+
+				if (*(it + 1) == ";")
+					throw std::runtime_error("webserv: [emerg] invalid number of arguments in \"index\" directive");
+
+				if (check_index_setting == false){
+					this->index.clear();
+					check_index_setting = true;
+				}
+
+				it++;
 				while (*it != ";")
 				{
-					std::cout << "[" << *it << "] " << std::endl;
+					this->index.push_back(*it);
 					it++;
 				}
 				it++;
-				std::cout << std::endl;
 
 			}else if (*it == "autoindex"){
 				
@@ -250,13 +279,14 @@ public:
 			}
 		}
 
-		
+
 		std::vector<std::vector<std::string> >::iterator server_it = servers_tokens.begin();
 		for (; server_it != servers_tokens.end(); server_it++){
-			
 			Server *new_server = new Server(*server_it);
 		}
-		
+
+		print_status_for_debug();  // TODO : remove
+	
 	}
 	
 	//HttpConfig(const HttpConfig& HttpConfig);
@@ -273,6 +303,36 @@ public:
 	Location* getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path)
 	{
 		return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
+	}
+
+
+
+
+
+
+
+
+	void print_status_for_debug(void){  // TODO : remove
+		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+		
+		std::cout << "root : " << this->root << std::endl;
+		
+		std::cout << "index : ";
+		for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
+			std::cout << *i << " ";
+		}
+		std::cout << std::endl;
+		
+		std::cout << "autoindex : " << this->autoindex << std::endl;
+
+		std::cout << "client_max_body_size : " << this->client_max_body_size << std::endl;
+
+		std::cout << "error_page : " ;
+		for (std::map<int, std::string>::iterator i = this->error_page.begin(); i != this->error_page.end(); i++){
+			std::cout << i->first << ":" << i->second << "  ";
+		}
+		std::cout << std::endl;
+		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 	}
 };
 

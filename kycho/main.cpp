@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/02 22:39:43 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/02 23:07:09 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,14 @@ int main(int argc, char *argv[])
 	std::cout << loc->root << std::endl;
 	*/
 
-	HttpConfig config("./sample.conf");
+	try
+	{
+		HttpConfig config("./sample.conf");
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	
 	
 
