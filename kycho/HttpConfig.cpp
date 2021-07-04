@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 06:43:18 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/04 13:20:30 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,10 +133,6 @@ HttpConfig::HttpConfig(std::string configFilePath)
 	this->index.push_back("index.html");
 	this->autoindex = false;
 	this->client_max_body_size = 1000000;
-
-
-	print_status_for_debug();  // TODO : remove
-
 	
 	// 한번이라도 세팅했었는지 체크하는 변수 
 	bool check_root_setting = false;
