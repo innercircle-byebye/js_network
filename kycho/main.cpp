@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 06:39:14 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 18:46:42 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,6 @@
 
 int main(int argc, char *argv[])
 {
-	/*
-	HttpConfig config;
-
-	std::multimap<in_port_t, in_addr_t> map = config.getMustListens();
-
-	std::multimap<in_port_t, in_addr_t>::iterator it = map.begin();
-	for (; it != map.end(); ++it)
-		std::cout << it->first << " " << it->second << std::endl;
-
-	Location* loc = config.getLocationConfig(8080, inet_addr("127.0.0.1"), "somename", "/");
-
-	std::cout << loc->autoindex << std::endl;
-	std::cout << loc->root << std::endl;
-	*/
-
 	HttpConfig* config;
 	try
 	{
@@ -40,11 +25,27 @@ int main(int argc, char *argv[])
 		std::cerr << e.what() << '\n';
 	}
 
+
+
+
+	std::cout << "\n\n\n<<< must_listens 출력 시작>>>" << std::endl;
 	std::multimap<in_port_t, in_addr_t> must_listens = config->getMustListens();
-	for (std::multimap<in_port_t, in_addr_t>::iterator it = must_listens.begin(); it != must_listens.end(); it++){
-		std::cout << it->second << " " << it->first << std::endl; 
-	}	
-	
+	for (std::multimap<in_port_t, in_addr_t>::iterator it = must_listens.begin(); it != must_listens.end(); it++)
+	{
+		in_addr_t ip_addr = it->second;
+		in_port_t port = it->first;
+		struct in_addr addr;
+		addr.s_addr = ip_addr;
+		std::cout << "ip_addr:port   => " << inet_ntoa(addr) << ":" << ntohs(it->first) << std::endl; 
+	}
+	std::cout << "<<< must_listens 출력 끝>>>\n\n\n" << std::endl;
+
+
+	// 전체상태 출력해보는 함수
+	config->print_all_server_location_for_debug();
+
+
+
 
 	std::cout << "main 끝~~~" << std::endl;
 	return (0);

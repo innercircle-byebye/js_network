@@ -6,11 +6,13 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/04 12:50:27 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 18:43:22 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+Server::Server(void) {}
 
 Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 {
@@ -124,6 +126,8 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 
 			if (*(it + 1) == "on")
 				this->autoindex = true;
+			else
+				this->autoindex = false;
 
 			check_autoindex_setting = true;
 			it += 3;
@@ -213,8 +217,62 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 	for (; location_it != locations_tokens.end(); location_it++){
 		
 		Location *new_location = new Location(*location_it, this);
+
+		locations.push_back(new_location);
 	}
 
-	print_status_for_debug();  // TODO : remove
+	print_status_for_debug("\t");  // TODO : remove
 	
+}
+
+Server::~Server(void)
+{
+	std::cout << "~Server() 호출~~~" << std::endl;
+}
+
+
+// ############## for debug ###################
+void Server::print_status_for_debug(std::string prefix)  // TODO : remove
+{
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Server ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+
+	std::cout << prefix;
+	std::cout << "listen : ";
+	for (std::vector<std::string>::iterator i = this->listens.begin(); i != this->listens.end(); i++){
+		std::cout << *i << "  ";
+	}
+	std::cout << std::endl;
+
+	std::cout << prefix;
+	std::cout << "server_name : ";
+	for (std::vector<std::string>::iterator i = this->server_name.begin(); i != this->server_name.end(); i++){
+		std::cout << *i << "  ";
+	}
+	std::cout << std::endl;
+	
+	std::cout << prefix;
+	std::cout << "root : " << this->root << std::endl;
+	
+	std::cout << prefix;
+	std::cout << "index : ";
+	for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
+		std::cout << *i << " ";
+	}
+	std::cout << std::endl;
+	
+	std::cout << prefix;
+	std::cout << "autoindex : " << this->autoindex << std::endl;
+
+	std::cout << prefix;
+	std::cout << "client_max_body_size : " << this->client_max_body_size << std::endl;
+
+	std::cout << prefix;
+	std::cout << "error_page : " ;
+	for (std::map<int, std::string>::iterator i = this->error_page.begin(); i != this->error_page.end(); i++){
+		std::cout << i->first << ":" << i->second << "  ";
+	}
+	std::cout << std::endl;
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 }

@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/04 13:20:30 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 18:46:57 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,14 @@ HttpConfig::HttpConfig(std::string configFilePath)
 	ft::Tokenizer tokenizer;
 	std::vector<std::string> tokens = tokenizer.parse(content);
 
+	// TODO : remove 토큰 확인해보려고 출력함 지울것 
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	for (std::vector<std::string>::iterator iit = tokens.begin(); iit != tokens.end(); iit++){
+		std::cout << "[" << *iit << "]" << std::endl;
+	}
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	
+
 	std::vector<std::vector<std::string> > servers_tokens;  // Server 객체 생성할떄 사용할 토큰들
 
 	std::vector<std::string>::iterator it = tokens.begin();
@@ -201,6 +209,8 @@ HttpConfig::HttpConfig(std::string configFilePath)
 
 			if (*(it + 1) == "on")
 				this->autoindex = true;
+			else
+				this->autoindex = false;
 
 			check_autoindex_setting = true;
 			it += 3;
@@ -277,32 +287,108 @@ HttpConfig::HttpConfig(std::string configFilePath)
 
 		for (std::vector<std::string>::iterator i = new_server->listens.begin(); i != new_server->listens.end(); i++)
 		{
-			std::cout << "[" << *i << "] " << std::endl;
+			std::cout << "[" << *i << "] " << std::endl;  // TODO : remove
 
 			std::size_t pos = (*i).find(':');
 			std::string ip_addr_str = (*i).substr(0, pos);
 			std::string port_str = (*i).substr(pos + 1);
 
 			in_addr_t ip_addr = inet_addr(ip_addr_str.c_str());
-			in_port_t port = atoi(port_str.c_str());
+			in_port_t port = htons(atoi(port_str.c_str()));
 	
 			server[port][ip_addr].push_back(new_server);
 
-			if (must_listens.find(port)->second != inet_addr("0.0.0.0")){
+			if (must_listens.find(port) == must_listens.end() || must_listens.find(port)->second != inet_addr("0.0.0.0")){
 				if (ip_addr == inet_addr("0.0.0.0")){
 					must_listens.erase(port);
+					std::cout << "erase" << std::endl;
 				}
 				must_listens.insert(std::pair<in_port_t, in_addr_t>(port, ip_addr));
+				std::cout << "insert" << std::endl;
 			}		
 		}
 	}
 
-	print_status_for_debug();  // TODO : remove
+	print_status_for_debug("");  // TODO : remove
 
+}
+
+HttpConfig::~HttpConfig()
+{
+	std::cout << "~HttpConfig() 호출~~~" << std::endl;
+}
+
+std::multimap<in_port_t, in_addr_t>	HttpConfig::getMustListens(void)
+{
+	return must_listens;
 }
 
 Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path)
 {
 	//return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
 	return server[port][ip_addr][0]->locations[0];
+}
+
+
+// ############## for debug ###################
+void HttpConfig::print_all_server_location_for_debug(void)  // TODO : remove
+{
+	this->print_status_for_debug("");
+	
+	for (std::map<in_port_t, std::map<in_addr_t, std::vector<Server*> > >::iterator it = server.begin(); it != server.end(); it++)
+	{
+		in_port_t port = it->first;
+		std::map<in_addr_t, std::vector<Server*> > addr_server_map = it->second;
+		
+		std::cout << "port : " <<  ntohs(port) << std::endl;
+		
+		for (std::map<in_addr_t, std::vector<Server*> >::iterator it2 = addr_server_map.begin(); it2 != addr_server_map.end(); it2++){
+			in_addr_t ip_addr = it2->first;
+			std::vector<Server*> server_list = it2->second;
+
+			struct in_addr addr1;
+			addr1.s_addr = ip_addr;
+			std::cout << "\tip_addr : " << inet_ntoa(addr1) << std::endl;
+
+			for (std::vector<Server*>::iterator it3 = server_list.begin(); it3 != server_list.end(); it3++){
+				(*it3)->print_status_for_debug("\t\t");		
+
+				std::vector<Location*>	locations = (*it3)->locations;
+				for (std::vector<Location*>::iterator it4 = locations.begin(); it4 != locations.end(); it4++){
+					(*it4)->print_status_for_debug("\t\t\t");
+				}
+
+			}
+		}
+	}
+}
+
+void HttpConfig::print_status_for_debug(std::string prefix){  // TODO : remove
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HttpConfig ~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+	
+	std::cout << prefix;
+	std::cout << "root : " << this->root << std::endl;
+	
+	std::cout << prefix;
+	std::cout << "index : ";
+	for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
+		std::cout << *i << " ";
+	}
+	std::cout << std::endl;
+	
+	std::cout << prefix;
+	std::cout << "autoindex : " << this->autoindex << std::endl;
+
+	std::cout << prefix;
+	std::cout << "client_max_body_size : " << this->client_max_body_size << std::endl;
+
+	std::cout << prefix;
+	std::cout << "error_page : " ;
+	for (std::map<int, std::string>::iterator i = this->error_page.begin(); i != this->error_page.end(); i++){
+		std::cout << i->first << ":" << i->second << "  ";
+	}
+	std::cout << std::endl;
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 }

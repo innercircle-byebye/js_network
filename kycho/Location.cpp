@@ -6,11 +6,14 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/04 13:37:10 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 18:43:15 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
+
+Location::Location(void)
+{}
 
 Location::Location(std::vector<std::string> tokens, Server* server)
 {
@@ -79,6 +82,8 @@ Location::Location(std::vector<std::string> tokens, Server* server)
 
 			if (*(it + 1) == "on")
 				this->autoindex = true;
+			else
+				this->autoindex = false;
 
 			check_autoindex_setting = true;
 			it += 3;
@@ -140,5 +145,46 @@ Location::Location(std::vector<std::string> tokens, Server* server)
 		}
 	}
 
-	print_status_for_debug();  // TODO : remove
+	print_status_for_debug("\t\t");  // TODO : remove
+}
+
+Location::~Location(void)
+{
+	std::cout << "~Location() 호출~~~" << std::endl;
+}
+
+
+// ############## for debug ###################
+void Location::print_status_for_debug(std::string prefix)  // TODO : remove
+{
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Location ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+
+	std::cout << prefix;
+	std::cout << "uri_path : " << this->uri_path << std::endl;
+
+	std::cout << prefix;		
+	std::cout << "root : " << this->root << std::endl;
+
+	std::cout << prefix;		
+	std::cout << "index : ";
+	for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
+		std::cout << *i << " ";
+	}
+	std::cout << std::endl;
+
+	std::cout << prefix;		
+	std::cout << "autoindex : " << this->autoindex << std::endl;
+
+	std::cout << prefix;
+	std::cout << "client_max_body_size : " << this->client_max_body_size << std::endl;
+
+	std::cout << prefix;
+	std::cout << "error_page : " ;
+	for (std::map<int, std::string>::iterator i = this->error_page.begin(); i != this->error_page.end(); i++){
+		std::cout << i->first << ":" << i->second << "  ";
+	}
+	std::cout << std::endl;
+	std::cout << prefix;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 }

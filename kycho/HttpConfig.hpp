@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:47:53 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/03 14:13:23 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 18:48:27 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,45 +48,15 @@ public:
 public:
 	HttpConfig(void);
 	HttpConfig(std::string configFilePath);
-	//HttpConfig(const HttpConfig& HttpConfig);
-	
-	~HttpConfig() {
-		std::cout << "~HttpConfig() 호출~~~" << std::endl;
-	}
-	
-	//HttpConfig& operator=(const HttpConfig& other);
+	~HttpConfig();
 
-	std::multimap<in_port_t, in_addr_t>	getMustListens(void)
-	{
-		return must_listens;
-	}
-
+	std::multimap<in_port_t, in_addr_t>	getMustListens(void);
 	Location* getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path);
 
 
-
-	void print_status_for_debug(void){  // TODO : remove
-		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HttpConfig ~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
-		
-		std::cout << "root : " << this->root << std::endl;
-		
-		std::cout << "index : ";
-		for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
-			std::cout << *i << " ";
-		}
-		std::cout << std::endl;
-		
-		std::cout << "autoindex : " << this->autoindex << std::endl;
-
-		std::cout << "client_max_body_size : " << this->client_max_body_size << std::endl;
-
-		std::cout << "error_page : " ;
-		for (std::map<int, std::string>::iterator i = this->error_page.begin(); i != this->error_page.end(); i++){
-			std::cout << i->first << ":" << i->second << "  ";
-		}
-		std::cout << std::endl;
-		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
-	}
+	// for debug
+	void print_all_server_location_for_debug(void);  // TODO : remove
+	void print_status_for_debug(std::string prefix);  // TODO : remove
 };
 
 #endif
