@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:46:49 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 18:42:25 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 23:16:18 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ public:
 	Server(void);
 	Server(std::vector<std::string> tokens, HttpConfig* httpConfig);
 	~Server(void);
+
+	bool isMatchServerName(std::string server_name_str);
 
 	// for debug
 	void print_status_for_debug(std::string prefix);  // TODO : remove

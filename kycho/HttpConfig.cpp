@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 18:46:57 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 01:29:09 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -321,6 +321,40 @@ HttpConfig::~HttpConfig()
 std::multimap<in_port_t, in_addr_t>	HttpConfig::getMustListens(void)
 {
 	return must_listens;
+}
+
+Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name)
+{
+	if (server.find(port) == server.end())
+		return NULL;
+
+	std::vector<Server*> *server_list = NULL;
+
+	if (server[port].find(ip_addr) != server[port].end())
+	{
+		server_list = &server[port][ip_addr];
+	}
+	else if (server[port].find(inet_addr("0.0.0.0"))!= server[port].end())
+	{
+		server_list = &server[port][inet_addr("0.0.0.0")];
+	}
+
+	if (server_list == NULL)
+	{
+		return NULL;
+	}
+
+	Server* server_ptr = (*server_list)[0];
+
+	for(std::vector<Server*>::iterator it = server_list->begin(); it != server_list->end(); it++)
+	{
+		if ((*it)->isMatchServerName(server_name))
+		{
+			server_ptr = *it;
+		}
+	}
+
+	return server_ptr;
 }
 
 Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path)

@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 18:43:22 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 23:22:40 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,6 +230,19 @@ Server::~Server(void)
 	std::cout << "~Server() 호출~~~" << std::endl;
 }
 
+
+bool Server::isMatchServerName(std::string server_name_str)
+{
+	//std::vector<std::string>	server_name;
+	for (std::vector<std::string>::iterator it = server_name.begin(); it != server_name.end(); it++)
+	{
+		if (*it == server_name_str)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 // ############## for debug ###################
 void Server::print_status_for_debug(std::string prefix)  // TODO : remove
