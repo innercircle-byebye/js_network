@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:47:53 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 19:18:35 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 00:32:13 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,7 @@ class LocationConfig;
 
 class HttpConfig
 {
-//private:
-public:
+private:
 	std::multimap<in_port_t, in_addr_t>			must_listens;
 	
 	std::string									root;
@@ -49,9 +48,15 @@ public:
 	HttpConfig(std::string config_file_path);
 	~HttpConfig();
 
-	std::multimap<in_port_t, in_addr_t>	getMustListens(void);
 	ServerConfig* getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name);
 	LocationConfig* getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri);
+
+	const std::multimap<in_port_t, in_addr_t>&	getMustListens(void) const;
+	const std::string&							getRoot(void) const;
+	const std::vector<std::string>				getIndex(void) const;
+	const bool&									getAutoindex(void) const;
+	const unsigned long&						getClientMaxBodySize(void) const;
+	const std::map<int, std::string>&			getErrorPage(void) const;
 
 	// for debug
 	void print_all_server_location_for_debug(void);  // TODO : remove

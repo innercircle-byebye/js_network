@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 19:44:43 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 00:34:42 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ HttpConfig::HttpConfig(std::string config_file_path)
 	for (; server_it != servers_tokens.end(); server_it++){
 		ServerConfig *new_server = new ServerConfig(*server_it, this);
 
-		for (std::vector<std::string>::iterator i = new_server->listen.begin(); i != new_server->listen.end(); i++)
+		for (std::vector<std::string>::const_iterator i = new_server->getListen().begin(); i != new_server->getListen().end(); i++)
 		{
 			std::size_t pos = (*i).find(':');
 			std::string ip_addr_str = (*i).substr(0, pos);
@@ -186,11 +186,6 @@ HttpConfig::HttpConfig(std::string config_file_path)
 HttpConfig::~HttpConfig()
 {
 	std::cout << "~HttpConfig() 호출~~~" << std::endl;
-}
-
-std::multimap<in_port_t, in_addr_t>	HttpConfig::getMustListens(void)
-{
-	return this->must_listens;
 }
 
 ServerConfig* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name)
@@ -238,6 +233,36 @@ LocationConfig* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr,
 	return location_config;
 }
 
+const std::multimap<in_port_t, in_addr_t>& HttpConfig::getMustListens(void) const
+{
+	return this->must_listens;
+}
+
+const std::string& HttpConfig::getRoot(void) const
+{
+	return this->root;
+}
+
+const std::vector<std::string> HttpConfig::getIndex(void) const
+{
+	return this->index;
+}
+
+const bool& HttpConfig::getAutoindex(void) const
+{
+	return this->autoindex;
+}
+
+const unsigned long& HttpConfig::getClientMaxBodySize(void) const
+{
+	return this->client_max_body_size;
+}
+
+const std::map<int, std::string>& HttpConfig::getErrorPage(void) const
+{
+	return this->error_page;
+}
+
 
 // ############## for debug ###################
 void HttpConfig::print_all_server_location_for_debug(void)  // TODO : remove
@@ -262,7 +287,7 @@ void HttpConfig::print_all_server_location_for_debug(void)  // TODO : remove
 			for (std::vector<ServerConfig*>::iterator it3 = server_list.begin(); it3 != server_list.end(); it3++){
 				(*it3)->print_status_for_debug("\t\t");		
 
-				std::vector<LocationConfig*>	locations = (*it3)->location_configs;
+				std::vector<LocationConfig*>	locations = (*it3)->getLocationConfigs();
 				for (std::vector<LocationConfig*>::iterator it4 = locations.begin(); it4 != locations.end(); it4++){
 					(*it4)->print_status_for_debug("\t\t\t");
 				}

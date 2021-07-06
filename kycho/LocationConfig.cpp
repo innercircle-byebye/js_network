@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 19:33:06 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 21:07:10 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* server_config)
 {	
 	// 초기화부분
-	this->root = server_config->root;
-	this->index = server_config->index;
-	this->autoindex = server_config->autoindex;
-	this->client_max_body_size = server_config->client_max_body_size;
+	this->root = server_config->getRoot();
+	this->index = server_config->getIndex();
+	this->autoindex = server_config->getAutoindex();
+	this->client_max_body_size = server_config->getClientMaxBodySize();
 	
 	// 한번이라도 세팅했었는지 체크하는 변수
 	bool check_root_setting = false;
@@ -127,7 +127,7 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 		}
 	}
 
-	for(std::map<int, std::string>::iterator i = server_config->error_page.begin(); i != server_config->error_page.end(); i++)
+	for(std::map<int, std::string>::const_iterator i = server_config->getErrorPage().begin(); i != server_config->getErrorPage().end(); i++)
 	{
 		int status_code = i->first;
 		std::string path = i->second;
@@ -155,6 +155,38 @@ bool LocationConfig::isPrefixMatchUri(std::string request_uri)
 	}
 	return false;
 }
+
+const std::string& LocationConfig::getUri(void) const
+{
+	return this->uri;
+}
+
+const std::string& LocationConfig::getRoot(void) const
+{
+	return this->root;	
+}
+
+const std::vector<std::string> LocationConfig::getIndex(void) const
+{
+	return this->index;
+}
+
+const bool& LocationConfig::getAutoindex(void) const
+{
+	return this->autoindex;
+}
+
+const unsigned long& LocationConfig::getClientMaxBodySize(void) const
+{
+	return this->client_max_body_size;
+}
+
+const std::map<int, std::string>& LocationConfig::getErrorPage(void) const
+{
+	return this->error_page;
+}
+
+
 
 // ############## for debug ###################
 void LocationConfig::print_status_for_debug(std::string prefix)  // TODO : remove

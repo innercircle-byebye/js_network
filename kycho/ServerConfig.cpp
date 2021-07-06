@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 19:43:10 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 00:41:04 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 bool ServerConfig::compare_uri_for_descending_order_by_length(const LocationConfig* first, const LocationConfig* second)
 {
-	return first->uri.length() > second->uri.length();
+	return first->getUri().length() > second->getUri().length();
 }
 
 ServerConfig::ServerConfig(std::vector<std::string> tokens, HttpConfig* http_config)
@@ -22,10 +22,10 @@ ServerConfig::ServerConfig(std::vector<std::string> tokens, HttpConfig* http_con
 	// 초기화부분 
 	this->listen.push_back("0.0.0.0:80");
 	this->server_name.push_back("");
-	this->root = http_config->root;
-	this->index = http_config->index;
-	this->autoindex = http_config->autoindex;
-	this->client_max_body_size = http_config->client_max_body_size;
+	this->root = http_config->getRoot();
+	this->index = http_config->getIndex();
+	this->autoindex = http_config->getAutoindex();
+	this->client_max_body_size = http_config->getClientMaxBodySize();
 
 	// 한번이라도 세팅했었는지 체크하는 변수
 	bool check_listen_setting = false;
@@ -198,7 +198,7 @@ ServerConfig::ServerConfig(std::vector<std::string> tokens, HttpConfig* http_con
 		}
 	}
 
-	for(std::map<int, std::string>::iterator i = http_config->error_page.begin(); i != http_config->error_page.end(); i++)
+	for(std::map<int, std::string>::const_iterator i = http_config->getErrorPage().begin(); i != http_config->getErrorPage().end(); i++)
 	{
 		int status_code = i->first;
 		std::string path = i->second;
@@ -249,6 +249,41 @@ LocationConfig* ServerConfig::getLocationConfig(std::string request_uri)
 	return NULL;
 }
 
+const std::vector<std::string>& ServerConfig::getListen(void) const
+{
+	return this->listen;
+}
+
+const std::vector<std::string>& ServerConfig::getServerName(void) const
+{
+	return this->server_name;
+}
+
+const std::string& ServerConfig::getRoot(void) const
+{
+	return this->root;
+}
+
+const std::vector<std::string> ServerConfig::getIndex(void) const
+{
+	return this->index;
+}
+
+const bool& ServerConfig::getAutoindex(void) const
+{
+	return this->autoindex;
+}
+
+const unsigned long& ServerConfig::getClientMaxBodySize(void) const
+{
+	return this->client_max_body_size;
+}
+
+const std::map<int, std::string>& ServerConfig::getErrorPage(void) const
+{
+	return this->error_page;
+}
+
 // ############## for debug ###################
 void ServerConfig::print_status_for_debug(std::string prefix)  // TODO : remove
 {
@@ -293,4 +328,9 @@ void ServerConfig::print_status_for_debug(std::string prefix)  // TODO : remove
 	std::cout << std::endl;
 	std::cout << prefix;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+}
+
+const std::vector<LocationConfig*>&	ServerConfig::getLocationConfigs(void) const // TODO : remove
+{
+	return this->location_configs;
 }

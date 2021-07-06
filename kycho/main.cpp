@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 19:47:29 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 21:09:05 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,11 @@ int main(void)
 	if (server == NULL){
 		std::cout << "server is null" << std::endl;
 	}else {
-		std::vector<LocationConfig*> &locations = server->location_configs;
+		const std::vector<LocationConfig*> &locations = server->getLocationConfigs();
+		//server->getLocationConfigs()
 		
-		for(std::vector<LocationConfig*>::iterator it = locations.begin(); it != locations.end(); it++){
-			std::cout << "uri_path : " << (*it)->uri << std::endl;
+		for(std::vector<LocationConfig*>::const_iterator it = locations.begin(); it != locations.end(); it++){
+			std::cout << "uri_path : " << (*it)->getUri() << std::endl;
 		}
 
 		LocationConfig* location = server->getLocationConfig(request_uri2);
