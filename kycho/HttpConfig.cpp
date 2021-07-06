@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 01:29:09 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 10:43:51 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,10 +357,14 @@ Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::stri
 	return server_ptr;
 }
 
-Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string uri_path)
+Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri)
 {
 	//return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
-	return server[port][ip_addr][0]->locations[0];
+	//return server[port][ip_addr][0]->locations[0];
+
+	Server* server_config = this->getServerConfig(port, ip_addr, server_name);
+	Location* location_config = server_config->getLocationConfig(request_uri);
+	return location_config;
 }
 
 

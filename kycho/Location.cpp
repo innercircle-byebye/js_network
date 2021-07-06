@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 18:43:15 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 23:47:57 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,17 @@ Location::~Location(void)
 	std::cout << "~Location() 호출~~~" << std::endl;
 }
 
+bool Location::isPrefixMatchUri(std::string request_uri)
+{
+	if (this->uri_path.length() <= request_uri.length())
+	{
+		if (request_uri.compare(0, this->uri_path.length(), this->uri_path) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 // ############## for debug ###################
 void Location::print_status_for_debug(std::string prefix)  // TODO : remove

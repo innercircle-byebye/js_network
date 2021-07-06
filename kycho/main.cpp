@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 01:25:44 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 11:13:42 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,32 @@ int main(int argc, char *argv[])
 	config->print_all_server_location_for_debug();
 
 
+	in_port_t port2 = htons(80);
+	in_addr_t ip_addr2 = inet_addr("123.123.123.123");
+	std::string server_name2 = "ccc";
+	std::string request_uri2 = "/";
+
 	std::cout << "----- getServerConfig() test -----" << std::endl;
-	Server* server = config->getServerConfig(htons(8080), inet_addr("127.0.0.1"), "localhost");
+	Server* server = config->getServerConfig(port2, ip_addr2, server_name2);
 	if (server == NULL){
 		std::cout << "server is null" << std::endl;
 	}else {
 		server->print_status_for_debug("");
+
+		std::vector<Location*> &locations = server->locations;
+
+		for(std::vector<Location*>::iterator it = locations.begin(); it != locations.end(); it++){
+			std::cout << "uri_path : " << (*it)->uri_path << std::endl;
+		}
+
+		Location* location = server->getLocationConfig(request_uri2);
+
+		location->print_status_for_debug("\t");
 	}
+
+
+	Location* location2 = config->getLocationConfig(port2, ip_addr2, server_name2, request_uri2);
+	location2->print_status_for_debug("\t");
 	
 
 

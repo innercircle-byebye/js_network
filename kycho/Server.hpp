@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:46:49 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 23:16:18 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 11:28:02 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <vector>
 # include <map>
 # include <string>
+# include <algorithm>
 
 # include "HttpConfig.hpp"
 # include "Location.hpp"
@@ -45,9 +46,18 @@ public:
 	~Server(void);
 
 	bool isMatchServerName(std::string server_name_str);
+	Location* getLocationConfig(std::string request_uri);
 
 	// for debug
 	void print_status_for_debug(std::string prefix);  // TODO : remove
+
+private:
+	// struct compare_uri_for_descending_order_by_length
+	// {
+	// 	bool operator()(const Location* first, const Location* second) const; 
+	// }; 
+	
+	static bool compare_uri_for_descending_order_by_length(const Location* first, const Location* second);
 };
 
 #endif

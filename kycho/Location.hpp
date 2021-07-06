@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:48:51 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 18:40:03 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/05 23:48:01 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ public:
 	Location(void);
 	Location(std::vector<std::string> tokens, Server* server);
 	~Location(void);
+
+	bool isPrefixMatchUri(std::string request_uri);
 
 	// for debug
 	void print_status_for_debug(std::string prefix);  // TODO : remove

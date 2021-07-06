@@ -6,11 +6,21 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 23:22:40 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 11:07:16 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+// bool Server::compare_uri_for_descending_order_by_length::operator()(const Location* first, const Location* second) const 
+// {
+// 	return first->uri_path.length() > second->uri_path.length();
+// }
+
+bool Server::compare_uri_for_descending_order_by_length(const Location* first, const Location* second)
+{
+	return first->uri_path.length() > second->uri_path.length();
+}
 
 Server::Server(void) {}
 
@@ -221,6 +231,9 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 		locations.push_back(new_location);
 	}
 
+	//std::sort(locations.begin(), locations.end(), Server::compare_uri_for_descending_order_by_length());
+	std::sort(locations.begin(), locations.end(), this->compare_uri_for_descending_order_by_length);
+
 	print_status_for_debug("\t");  // TODO : remove
 	
 }
@@ -242,6 +255,19 @@ bool Server::isMatchServerName(std::string server_name_str)
 		}
 	}
 	return false;
+}
+
+Location* Server::getLocationConfig(std::string request_uri)
+{
+	//std::vector<Location*>		locations;
+	for (std::vector<Location*>::iterator it = this->locations.begin(); it != this->locations.end(); it++)
+	{
+		if ((*it)->isPrefixMatchUri(request_uri))
+		{
+			return *it;
+		}
+	}
+	return NULL;
 }
 
 // ############## for debug ###################
