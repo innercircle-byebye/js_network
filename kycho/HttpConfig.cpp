@@ -6,14 +6,14 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 14:39:36 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 16:48:29 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpConfig.hpp"
 
 HttpConfig::HttpConfig(void)
-{	
+{
 	// must_listens;
 	must_listens.insert(std::pair<in_port_t, in_addr_t>(80, inet_addr("0.0.0.0")));
 	must_listens.insert(std::pair<in_port_t, in_addr_t>(8080, inet_addr("0.0.0.0")));
@@ -28,7 +28,7 @@ HttpConfig::HttpConfig(void)
 	
 	
 	// make server blocks start
-	Server* server1 = new Server();
+	ServerConfig* server1 = new ServerConfig();
 	server1->root = this->root;
 	server1->index = this->index;
 	server1->autoindex = this->autoindex;
@@ -36,7 +36,7 @@ HttpConfig::HttpConfig(void)
 	server1->client_max_body_size = this->client_max_body_size;
 
 
-	Server* server2 = new Server();
+	ServerConfig* server2 = new ServerConfig();
 	server2->root = this->root;
 	server2->index = this->index;
 	//server2->autoindex = this->autoindex;
@@ -51,7 +51,7 @@ HttpConfig::HttpConfig(void)
 	server2->server_name.push_back("localhost");
 
 
-	Server* server3 = new Server();
+	ServerConfig* server3 = new ServerConfig();
 	server3->root = this->root;
 	server3->index = this->index;
 	server3->autoindex = this->autoindex;
@@ -65,7 +65,7 @@ HttpConfig::HttpConfig(void)
 
 
 	// make location blocks start
-	Location* location1 = new Location();
+	LocationConfig* location1 = new LocationConfig();
 	location1->uri_path = "/default";
 	location1->root = server1->root;
 	location1->index = server1->index;
@@ -73,7 +73,7 @@ HttpConfig::HttpConfig(void)
 	location1->error_page = server1->error_page;
 	location1->client_max_body_size = server1->client_max_body_size;
 
-	Location* location2 = new Location();
+	LocationConfig* location2 = new LocationConfig();
 	location2->uri_path = "/";
 	location2->root = "html";
 	location2->index.push_back("index.html");
@@ -83,7 +83,7 @@ HttpConfig::HttpConfig(void)
 	location2->client_max_body_size = server2->client_max_body_size;
 
 
-	Location* location3 = new Location();
+	LocationConfig* location3 = new LocationConfig();
 	location3->uri_path = "/test/";
 	location3->root = server2->root;
 	location3->index.push_back("test.html");
@@ -92,7 +92,7 @@ HttpConfig::HttpConfig(void)
 	location3->client_max_body_size = server2->client_max_body_size;
 
 
-	Location* location4 = new Location();
+	LocationConfig* location4 = new LocationConfig();
 	location4->uri_path = "/50x.html";
 	location4->root = "html";
 	location4->index = server2->index;
@@ -101,7 +101,7 @@ HttpConfig::HttpConfig(void)
 	location4->client_max_body_size = server2->client_max_body_size;
 
 
-	Location* location5 = new Location();
+	LocationConfig* location5 = new LocationConfig();
 	location5->uri_path = "/";
 	location5->root = "html";
 	location5->index.push_back("index.html");
@@ -149,7 +149,7 @@ HttpConfig::HttpConfig(std::string configFilePath)
 	std::vector<std::string> tokens = tokenizer.parse(content);
 
 
-	std::vector<std::vector<std::string> > servers_tokens;  // Server 객체 생성할떄 사용할 토큰들
+	std::vector<std::vector<std::string> > servers_tokens;  // ServerConfig 객체 생성할떄 사용할 토큰들
 
 	std::vector<std::string>::iterator it = tokens.begin();
 	
@@ -275,7 +275,7 @@ HttpConfig::HttpConfig(std::string configFilePath)
 
 	std::vector<std::vector<std::string> >::iterator server_it = servers_tokens.begin();
 	for (; server_it != servers_tokens.end(); server_it++){
-		Server *new_server = new Server(*server_it, this);
+		ServerConfig *new_server = new ServerConfig(*server_it, this);
 
 		for (std::vector<std::string>::iterator i = new_server->listens.begin(); i != new_server->listens.end(); i++)
 		{
@@ -308,12 +308,12 @@ std::multimap<in_port_t, in_addr_t>	HttpConfig::getMustListens(void)
 	return must_listens;
 }
 
-Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name)
+ServerConfig* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name)
 {
 	if (server.find(port) == server.end())
 		return NULL;
 
-	std::vector<Server*> *server_list = NULL;
+	std::vector<ServerConfig*> *server_list = NULL;
 
 	if (server[port].find(ip_addr) != server[port].end())
 	{
@@ -329,9 +329,9 @@ Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::stri
 		return NULL;
 	}
 
-	Server* server_ptr = (*server_list)[0];
+	ServerConfig* server_ptr = (*server_list)[0];
 
-	for(std::vector<Server*>::iterator it = server_list->begin(); it != server_list->end(); it++)
+	for(std::vector<ServerConfig*>::iterator it = server_list->begin(); it != server_list->end(); it++)
 	{
 		if ((*it)->isMatchServerName(server_name))
 		{
@@ -342,10 +342,10 @@ Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::stri
 	return server_ptr;
 }
 
-Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri)
+LocationConfig* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri)
 {
-	Server* server_config = this->getServerConfig(port, ip_addr, server_name);
-	Location* location_config = server_config->getLocationConfig(request_uri);
+	ServerConfig* server_config = this->getServerConfig(port, ip_addr, server_name);
+	LocationConfig* location_config = server_config->getLocationConfig(request_uri);
 	return location_config;
 }
 
@@ -355,26 +355,26 @@ void HttpConfig::print_all_server_location_for_debug(void)  // TODO : remove
 {
 	this->print_status_for_debug("");
 	
-	for (std::map<in_port_t, std::map<in_addr_t, std::vector<Server*> > >::iterator it = server.begin(); it != server.end(); it++)
+	for (std::map<in_port_t, std::map<in_addr_t, std::vector<ServerConfig*> > >::iterator it = server.begin(); it != server.end(); it++)
 	{
 		in_port_t port = it->first;
-		std::map<in_addr_t, std::vector<Server*> > addr_server_map = it->second;
+		std::map<in_addr_t, std::vector<ServerConfig*> > addr_server_map = it->second;
 		
 		std::cout << "port : " <<  ntohs(port) << std::endl;
 		
-		for (std::map<in_addr_t, std::vector<Server*> >::iterator it2 = addr_server_map.begin(); it2 != addr_server_map.end(); it2++){
+		for (std::map<in_addr_t, std::vector<ServerConfig*> >::iterator it2 = addr_server_map.begin(); it2 != addr_server_map.end(); it2++){
 			in_addr_t ip_addr = it2->first;
-			std::vector<Server*> server_list = it2->second;
+			std::vector<ServerConfig*> server_list = it2->second;
 
 			struct in_addr addr1;
 			addr1.s_addr = ip_addr;
 			std::cout << "\tip_addr : " << inet_ntoa(addr1) << std::endl;
 
-			for (std::vector<Server*>::iterator it3 = server_list.begin(); it3 != server_list.end(); it3++){
+			for (std::vector<ServerConfig*>::iterator it3 = server_list.begin(); it3 != server_list.end(); it3++){
 				(*it3)->print_status_for_debug("\t\t");		
 
-				std::vector<Location*>	locations = (*it3)->locations;
-				for (std::vector<Location*>::iterator it4 = locations.begin(); it4 != locations.end(); it4++){
+				std::vector<LocationConfig*>	locations = (*it3)->locations;
+				for (std::vector<LocationConfig*>::iterator it4 = locations.begin(); it4 != locations.end(); it4++){
 					(*it4)->print_status_for_debug("\t\t\t");
 				}
 

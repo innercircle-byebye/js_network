@@ -1,90 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   LocationConfig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 14:43:06 by kycho            ###   ########.fr       */
+/*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
+/*   Updated: 2021/07/06 16:51:50 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "LocationConfig.hpp"
 
-bool Server::compare_uri_for_descending_order_by_length(const Location* first, const Location* second)
-{
-	return first->uri_path.length() > second->uri_path.length();
-}
+LocationConfig::LocationConfig(void)
+{}
 
-Server::Server(void) {}
-
-Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
-{
-	// 초기화부분 
-	this->listens.push_back("0.0.0.0:80");
-	this->server_name.push_back("");
-	this->root = httpConfig->root;
-	this->index = httpConfig->index;
-	this->autoindex = httpConfig->autoindex;
-	this->client_max_body_size = httpConfig->client_max_body_size;
-
+LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* server)
+{	
+	// 초기화부분
+	this->root = server->root;
+	this->index = server->index;
+	this->autoindex = server->autoindex;
+	this->client_max_body_size = server->client_max_body_size;
+	
 	// 한번이라도 세팅했었는지 체크하는 변수
-	bool check_listen_setting = false;
-	bool check_server_name_setting = false;
 	bool check_root_setting = false;
 	bool check_index_setting = false;
 	bool check_autoindex_setting = false;
 	bool check_client_max_body_size = false;
-	
-	std::vector<std::vector<std::string> > locations_tokens;
 
-	std::vector<std::string>::iterator it = tokens.begin();  // "server"
-	it++;  // "{"
-	it++;  // any directive
+	std::vector<std::string>::iterator it = tokens.begin(); // "location"
+	it++;	// path
+	this->uri_path = *(it);
+	it++;	// "{"
+	it++;	// any directive
 
 	while(*it != "}")
 	{
-		if (*it == "listen")
-		{
-			// TODO : 예외처리해야함 
-
-			if (check_listen_setting == false){
-				listens.clear();
-				check_listen_setting = true;
-			}
-
-			std::string listen_value = *(it + 1);
-			
-			if (listen_value.find(':') == std::string::npos){
-				if (listen_value.find('.') == std::string::npos){
-					listen_value = "0.0.0.0:" + listen_value;
-				}else{
-					listen_value = listen_value + ":80";
-				}
-			}
-			listens.push_back(listen_value);
-			
-			it += 3;
-		}
-		else if (*it == "server_name")
-		{
-			// TODO : 예외처리해야함 
-
-			if (check_index_setting == false){
-				this->server_name.clear();
-				check_server_name_setting = true;
-			}
-
-			it++;
-			while (*it != ";")
-			{
-				this->server_name.push_back(*it);
-				it++;
-			}
-			it++;
-		}
-		else if (*it == "root")
+		if (*it == "root")
 		{
 			if (*(it + 1) == ";" || *(it + 2) != ";")
 				throw std::runtime_error("webserv: [emerg] invalid number of arguments in \"root\" directive");
@@ -171,36 +124,13 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 			check_client_max_body_size = true;
 			it += 3;
 		}
-		else if (*it == "location")
-		{
-
-			// TODO : 예외처리해야함
-			std::vector<std::string> location_tokekns;
-
-			location_tokekns.push_back(*it);
-			it++;
-			location_tokekns.push_back(*it);
-			it++;
-			location_tokekns.push_back(*it);
-			it++;
-
-			int cnt = 1;
-			while (cnt != 0){
-				if (*it == "{") cnt++;
-				else if (*it == "}") cnt--;
-				location_tokekns.push_back(*it);
-				it++;
-			}
-			locations_tokens.push_back(location_tokekns);
-			
-		}
 		else
 		{
 			throw std::runtime_error("webserv: [emerg] unknown directive \"" + (*it) + "\"");
 		}
 	}
 
-	for(std::map<int, std::string>::iterator i = httpConfig->error_page.begin(); i != httpConfig->error_page.end(); i++)
+	for(std::map<int, std::string>::iterator i = server->error_page.begin(); i != server->error_page.end(); i++)
 	{
 		int status_code = i->first;
 		std::string path = i->second;
@@ -210,28 +140,18 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 			this->error_page[status_code] = path;
 		}
 	}
-
-	
-	std::vector<std::vector<std::string> >::iterator location_it = locations_tokens.begin();
-	for (; location_it != locations_tokens.end(); location_it++){
-		Location *new_location = new Location(*location_it, this);
-		locations.push_back(new_location);
-	}
-	
-	std::sort(locations.begin(), locations.end(), this->compare_uri_for_descending_order_by_length);
 }
 
-Server::~Server(void)
+LocationConfig::~LocationConfig(void)
 {
-	std::cout << "~Server() 호출~~~" << std::endl;
+	std::cout << "~LocationConfig() 호출~~~" << std::endl;
 }
 
-
-bool Server::isMatchServerName(std::string server_name_str)
+bool LocationConfig::isPrefixMatchUri(std::string request_uri)
 {
-	for (std::vector<std::string>::iterator it = server_name.begin(); it != server_name.end(); it++)
+	if (this->uri_path.length() <= request_uri.length())
 	{
-		if (*it == server_name_str)
+		if (request_uri.compare(0, this->uri_path.length(), this->uri_path) == 0)
 		{
 			return true;
 		}
@@ -239,49 +159,26 @@ bool Server::isMatchServerName(std::string server_name_str)
 	return false;
 }
 
-Location* Server::getLocationConfig(std::string request_uri)
-{
-	for (std::vector<Location*>::iterator it = this->locations.begin(); it != this->locations.end(); it++)
-	{
-		if ((*it)->isPrefixMatchUri(request_uri))
-		{
-			return *it;
-		}
-	}
-	return NULL;
-}
-
 // ############## for debug ###################
-void Server::print_status_for_debug(std::string prefix)  // TODO : remove
+void LocationConfig::print_status_for_debug(std::string prefix)  // TODO : remove
 {
 	std::cout << prefix;
-	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Server ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LocationConfig ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 
 	std::cout << prefix;
-	std::cout << "listen : ";
-	for (std::vector<std::string>::iterator i = this->listens.begin(); i != this->listens.end(); i++){
-		std::cout << *i << "  ";
-	}
-	std::cout << std::endl;
+	std::cout << "uri_path : " << this->uri_path << std::endl;
 
-	std::cout << prefix;
-	std::cout << "server_name : ";
-	for (std::vector<std::string>::iterator i = this->server_name.begin(); i != this->server_name.end(); i++){
-		std::cout << *i << "  ";
-	}
-	std::cout << std::endl;
-	
-	std::cout << prefix;
+	std::cout << prefix;		
 	std::cout << "root : " << this->root << std::endl;
-	
-	std::cout << prefix;
+
+	std::cout << prefix;		
 	std::cout << "index : ";
 	for (std::vector<std::string>::iterator i = this->index.begin(); i != this->index.end(); i++){
 		std::cout << *i << " ";
 	}
 	std::cout << std::endl;
-	
-	std::cout << prefix;
+
+	std::cout << prefix;		
 	std::cout << "autoindex : " << this->autoindex << std::endl;
 
 	std::cout << prefix;
