@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:48:51 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 16:50:54 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 19:29:42 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class LocationConfig
 {
 //private:
 public:
-	std::string					uri_path;
+	std::string					uri;
 	
 	std::string					root;
 	std::vector<std::string>	index;
@@ -37,8 +37,7 @@ public:
 	// limit_except
 
 public:
-	LocationConfig(void);
-	LocationConfig(std::vector<std::string> tokens, ServerConfig* server);
+	LocationConfig(std::vector<std::string> tokens, ServerConfig* server_config);
 	~LocationConfig(void);
 
 	bool isPrefixMatchUri(std::string request_uri);

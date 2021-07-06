@@ -6,22 +6,19 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 16:51:50 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 19:33:06 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "LocationConfig.hpp"
 
-LocationConfig::LocationConfig(void)
-{}
-
-LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* server)
+LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* server_config)
 {	
 	// 초기화부분
-	this->root = server->root;
-	this->index = server->index;
-	this->autoindex = server->autoindex;
-	this->client_max_body_size = server->client_max_body_size;
+	this->root = server_config->root;
+	this->index = server_config->index;
+	this->autoindex = server_config->autoindex;
+	this->client_max_body_size = server_config->client_max_body_size;
 	
 	// 한번이라도 세팅했었는지 체크하는 변수
 	bool check_root_setting = false;
@@ -31,7 +28,7 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 
 	std::vector<std::string>::iterator it = tokens.begin(); // "location"
 	it++;	// path
-	this->uri_path = *(it);
+	this->uri = *(it);
 	it++;	// "{"
 	it++;	// any directive
 
@@ -114,11 +111,11 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 
 			char last_char = size_str[size_str.length() - 1];
 			if ( last_char == 'k'){
-				client_max_body_size *= 1000;
+				this->client_max_body_size *= 1000;
 			}else if (last_char == 'm'){
-				client_max_body_size *= 1000000;	
+				this->client_max_body_size *= 1000000;	
 			}else if (last_char == 'g'){
-				client_max_body_size *= 1000000000;	
+				this->client_max_body_size *= 1000000000;	
 			}
 			
 			check_client_max_body_size = true;
@@ -130,7 +127,7 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 		}
 	}
 
-	for(std::map<int, std::string>::iterator i = server->error_page.begin(); i != server->error_page.end(); i++)
+	for(std::map<int, std::string>::iterator i = server_config->error_page.begin(); i != server_config->error_page.end(); i++)
 	{
 		int status_code = i->first;
 		std::string path = i->second;
@@ -149,9 +146,9 @@ LocationConfig::~LocationConfig(void)
 
 bool LocationConfig::isPrefixMatchUri(std::string request_uri)
 {
-	if (this->uri_path.length() <= request_uri.length())
+	if (this->uri.length() <= request_uri.length())
 	{
-		if (request_uri.compare(0, this->uri_path.length(), this->uri_path) == 0)
+		if (request_uri.compare(0, this->uri.length(), this->uri) == 0)
 		{
 			return true;
 		}
@@ -166,7 +163,7 @@ void LocationConfig::print_status_for_debug(std::string prefix)  // TODO : remov
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LocationConfig ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
 
 	std::cout << prefix;
-	std::cout << "uri_path : " << this->uri_path << std::endl;
+	std::cout << "uri_path : " << this->uri << std::endl;
 
 	std::cout << prefix;		
 	std::cout << "root : " << this->root << std::endl;

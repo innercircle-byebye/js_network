@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:47:53 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 16:47:45 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 19:18:35 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,15 @@ public:
 	unsigned long								client_max_body_size;
 	std::map<int, std::string>					error_page;
 
-	std::map<in_port_t, std::map<in_addr_t, std::vector<ServerConfig*> > > server;
+	std::map<in_port_t, std::map<in_addr_t, std::vector<ServerConfig*> > > server_configs;
 
 public:
-	HttpConfig(void);
-	HttpConfig(std::string configFilePath);
+	HttpConfig(std::string config_file_path);
 	~HttpConfig();
 
 	std::multimap<in_port_t, in_addr_t>	getMustListens(void);
 	ServerConfig* getServerConfig(in_port_t port, in_addr_t ip_addr, std::string server_name);
 	LocationConfig* getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri);
-
 
 	// for debug
 	void print_all_server_location_for_debug(void);  // TODO : remove

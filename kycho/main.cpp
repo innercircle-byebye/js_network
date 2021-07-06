@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 16:56:43 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 19:47:29 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ int main(void)
 	{
 		std::cerr << e.what() << '\n';
 	}
-
 
 
 	std::cout << "\n\n\n<<< must_listens 출력 시작>>>" << std::endl;
@@ -53,10 +52,10 @@ int main(void)
 	if (server == NULL){
 		std::cout << "server is null" << std::endl;
 	}else {
-		std::vector<LocationConfig*> &locations = server->locations;
+		std::vector<LocationConfig*> &locations = server->location_configs;
 		
 		for(std::vector<LocationConfig*>::iterator it = locations.begin(); it != locations.end(); it++){
-			std::cout << "uri_path : " << (*it)->uri_path << std::endl;
+			std::cout << "uri_path : " << (*it)->uri << std::endl;
 		}
 
 		LocationConfig* location = server->getLocationConfig(request_uri2);
@@ -66,7 +65,6 @@ int main(void)
 		else{
 			location->print_status_for_debug("\t");
 		}
-		
 	}
 
 	std::cout << "----- getLocationConfig() test -----" << std::endl;
