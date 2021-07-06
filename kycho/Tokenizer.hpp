@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/18 19:18:46 by sucho             #+#    #+#             */
-/*   Updated: 2021/07/01 00:18:55 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 15:14:04 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ enum TokenType {
   DOUBLE_QUOTE_LITERAL,
   IDENTIFIER,
   OPERATOR,
-  COMMENT,
+  COMMENT
 };
 
 class Token {

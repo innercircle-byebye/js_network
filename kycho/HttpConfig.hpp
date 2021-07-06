@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:47:53 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 09:27:52 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 15:14:21 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ public:
 	std::string									root;
 	std::vector<std::string>					index;
 	bool										autoindex;
-	unsigned long long 							client_max_body_size;
+	unsigned long								client_max_body_size;
 	std::map<int, std::string>					error_page;
 
 	std::map<in_port_t, std::map<in_addr_t, std::vector<Server*> > > server;

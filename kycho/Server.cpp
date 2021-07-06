@@ -6,16 +6,11 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 11:07:16 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 14:43:06 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-
-// bool Server::compare_uri_for_descending_order_by_length::operator()(const Location* first, const Location* second) const 
-// {
-// 	return first->uri_path.length() > second->uri_path.length();
-// }
 
 bool Server::compare_uri_for_descending_order_by_length(const Location* first, const Location* second)
 {
@@ -26,9 +21,6 @@ Server::Server(void) {}
 
 Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 {
-	std::cout << " \t==============server constructor==========" << std::endl;
-
-
 	// 초기화부분 
 	this->listens.push_back("0.0.0.0:80");
 	this->server_name.push_back("");
@@ -36,8 +28,6 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 	this->index = httpConfig->index;
 	this->autoindex = httpConfig->autoindex;
 	this->client_max_body_size = httpConfig->client_max_body_size;
-	//this->error_page = httpConfig->error_page;
-
 
 	// 한번이라도 세팅했었는지 체크하는 변수
 	bool check_listen_setting = false;
@@ -47,7 +37,6 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 	bool check_autoindex_setting = false;
 	bool check_client_max_body_size = false;
 	
-
 	std::vector<std::vector<std::string> > locations_tokens;
 
 	std::vector<std::string>::iterator it = tokens.begin();  // "server"
@@ -225,17 +214,11 @@ Server::Server(std::vector<std::string> tokens, HttpConfig* httpConfig)
 	
 	std::vector<std::vector<std::string> >::iterator location_it = locations_tokens.begin();
 	for (; location_it != locations_tokens.end(); location_it++){
-		
 		Location *new_location = new Location(*location_it, this);
-
 		locations.push_back(new_location);
 	}
-
-	//std::sort(locations.begin(), locations.end(), Server::compare_uri_for_descending_order_by_length());
-	std::sort(locations.begin(), locations.end(), this->compare_uri_for_descending_order_by_length);
-
-	print_status_for_debug("\t");  // TODO : remove
 	
+	std::sort(locations.begin(), locations.end(), this->compare_uri_for_descending_order_by_length);
 }
 
 Server::~Server(void)
@@ -246,7 +229,6 @@ Server::~Server(void)
 
 bool Server::isMatchServerName(std::string server_name_str)
 {
-	//std::vector<std::string>	server_name;
 	for (std::vector<std::string>::iterator it = server_name.begin(); it != server_name.end(); it++)
 	{
 		if (*it == server_name_str)
@@ -259,7 +241,6 @@ bool Server::isMatchServerName(std::string server_name_str)
 
 Location* Server::getLocationConfig(std::string request_uri)
 {
-	//std::vector<Location*>		locations;
 	for (std::vector<Location*>::iterator it = this->locations.begin(); it != this->locations.end(); it++)
 	{
 		if ((*it)->isPrefixMatchUri(request_uri))

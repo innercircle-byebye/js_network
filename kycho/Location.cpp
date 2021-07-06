@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/05 23:47:57 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 14:40:16 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,18 @@ Location::Location(void)
 {}
 
 Location::Location(std::vector<std::string> tokens, Server* server)
-{
-	std::cout << " \t\t~~~~~~~~~~location constructor~~~~~~~~~~~~" << std::endl;
-	
+{	
 	// 초기화부분
 	this->root = server->root;
 	this->index = server->index;
 	this->autoindex = server->autoindex;
 	this->client_max_body_size = server->client_max_body_size;
 	
-
 	// 한번이라도 세팅했었는지 체크하는 변수
 	bool check_root_setting = false;
 	bool check_index_setting = false;
 	bool check_autoindex_setting = false;
 	bool check_client_max_body_size = false;
-
 
 	std::vector<std::string>::iterator it = tokens.begin(); // "location"
 	it++;	// path
@@ -144,8 +140,6 @@ Location::Location(std::vector<std::string> tokens, Server* server)
 			this->error_page[status_code] = path;
 		}
 	}
-
-	print_status_for_debug("\t\t");  // TODO : remove
 }
 
 Location::~Location(void)

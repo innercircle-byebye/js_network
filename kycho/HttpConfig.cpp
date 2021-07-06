@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:18:26 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 10:43:51 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/06 14:39:36 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,13 +148,6 @@ HttpConfig::HttpConfig(std::string configFilePath)
 	ft::Tokenizer tokenizer;
 	std::vector<std::string> tokens = tokenizer.parse(content);
 
-	// TODO : remove 토큰 확인해보려고 출력함 지울것 
-	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	for (std::vector<std::string>::iterator iit = tokens.begin(); iit != tokens.end(); iit++){
-		std::cout << "[" << *iit << "]" << std::endl;
-	}
-	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	
 
 	std::vector<std::vector<std::string> > servers_tokens;  // Server 객체 생성할떄 사용할 토큰들
 
@@ -280,15 +273,12 @@ HttpConfig::HttpConfig(std::string configFilePath)
 		}
 	}
 
-
 	std::vector<std::vector<std::string> >::iterator server_it = servers_tokens.begin();
 	for (; server_it != servers_tokens.end(); server_it++){
 		Server *new_server = new Server(*server_it, this);
 
 		for (std::vector<std::string>::iterator i = new_server->listens.begin(); i != new_server->listens.end(); i++)
 		{
-			std::cout << "[" << *i << "] " << std::endl;  // TODO : remove
-
 			std::size_t pos = (*i).find(':');
 			std::string ip_addr_str = (*i).substr(0, pos);
 			std::string port_str = (*i).substr(pos + 1);
@@ -301,16 +291,11 @@ HttpConfig::HttpConfig(std::string configFilePath)
 			if (must_listens.find(port) == must_listens.end() || must_listens.find(port)->second != inet_addr("0.0.0.0")){
 				if (ip_addr == inet_addr("0.0.0.0")){
 					must_listens.erase(port);
-					std::cout << "erase" << std::endl;
 				}
 				must_listens.insert(std::pair<in_port_t, in_addr_t>(port, ip_addr));
-				std::cout << "insert" << std::endl;
 			}		
 		}
 	}
-
-	print_status_for_debug("");  // TODO : remove
-
 }
 
 HttpConfig::~HttpConfig()
@@ -359,9 +344,6 @@ Server* HttpConfig::getServerConfig(in_port_t port, in_addr_t ip_addr, std::stri
 
 Location* HttpConfig::getLocationConfig(in_port_t port, in_addr_t ip_addr, std::string server_name, std::string request_uri)
 {
-	//return server[8080][inet_addr("127.0.0.1")][0]->locations[0];
-	//return server[port][ip_addr][0]->locations[0];
-
 	Server* server_config = this->getServerConfig(port, ip_addr, server_name);
 	Location* location_config = server_config->getLocationConfig(request_uri);
 	return location_config;

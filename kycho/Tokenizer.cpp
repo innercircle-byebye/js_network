@@ -92,7 +92,7 @@ std::vector<std::string> Tokenizer::parse(const std::string &file) {
   endToken(currentToken, tokens);
 
   return (tokens);
-};
+}
 
 void Tokenizer::endToken(Token &token, std::vector<std::string> &tokens) {
   if (token.m_type == COMMENT) {
@@ -103,6 +103,6 @@ void Tokenizer::endToken(Token &token, std::vector<std::string> &tokens) {
 
   token.m_type = WHITESPACE;
   token.m_text.erase();
-};
+}
 
 }  // namespace ft
