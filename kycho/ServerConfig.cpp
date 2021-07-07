@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 03:06:27 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/07 00:41:04 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 19:58:56 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,7 @@ LocationConfig* ServerConfig::getLocationConfig(std::string request_uri)
 {
 	for (std::vector<LocationConfig*>::iterator it = this->location_configs.begin(); it != this->location_configs.end(); it++)
 	{
-		if ((*it)->isPrefixMatchUri(request_uri))
+		if ((*it)->checkPrefixMatchUri(request_uri))
 		{
 			return *it;
 		}

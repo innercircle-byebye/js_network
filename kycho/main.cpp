@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/26 03:33:46 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 21:09:05 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 20:07:40 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ int main(void)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+		return (0);
 	}
 
 
@@ -75,11 +76,9 @@ int main(void)
 	}
 	else{
 		location2->print_status_for_debug("\t");
+		std::cout << "\t" << location2->checkAcceptedMethod("PUT") << std::endl;
 	}
 	
-	
-
-
 	std::cout << "main 끝~~~" << std::endl;
 	return (0);
 }

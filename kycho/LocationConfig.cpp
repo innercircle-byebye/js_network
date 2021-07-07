@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/03 14:11:56 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/06 21:07:10 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 19:59:16 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 	bool check_index_setting = false;
 	bool check_autoindex_setting = false;
 	bool check_client_max_body_size = false;
+	bool check_limit_except = false;
 
 	std::vector<std::string>::iterator it = tokens.begin(); // "location"
 	it++;	// path
@@ -121,6 +122,27 @@ LocationConfig::LocationConfig(std::vector<std::string> tokens, ServerConfig* se
 			check_client_max_body_size = true;
 			it += 3;
 		}
+		else if (*it == "limit_except")
+		{
+			if (*(it + 1) == ";")
+				throw std::runtime_error("webserv: [emerg] invalid number of arguments in \"limit_except\" directive");
+			if (check_limit_except == true)
+				throw std::runtime_error("webserv: [emerg] \"limit_except\" directive is duplicate");
+			
+			it++;
+			while (*it != ";")
+			{
+				if (*it != "GET" && *it != "HEAD" && *it != "POST" && *it != "PUT" && *it != "DELETE")
+				{
+					throw std::runtime_error("webserv: [emerg] invalid method \"" + (*it) + "\"");
+				}
+				this->limit_except.insert(*it);
+				it++;
+			}
+
+			check_limit_except = true;
+			it++;
+		}
 		else
 		{
 			throw std::runtime_error("webserv: [emerg] unknown directive \"" + (*it) + "\"");
@@ -144,7 +166,7 @@ LocationConfig::~LocationConfig(void)
 	std::cout << "~LocationConfig() 호출~~~" << std::endl;
 }
 
-bool LocationConfig::isPrefixMatchUri(std::string request_uri)
+bool LocationConfig::checkPrefixMatchUri(std::string request_uri)
 {
 	if (this->uri.length() <= request_uri.length())
 	{
@@ -186,6 +208,13 @@ const std::map<int, std::string>& LocationConfig::getErrorPage(void) const
 	return this->error_page;
 }
 
+bool LocationConfig::checkAcceptedMethod(const std::string request_method) const
+{
+	if (this->limit_except.size() == 0 || this->limit_except.count(request_method) == 1)
+		return true;
+	return false;
+}
+
 
 
 // ############## for debug ###################
@@ -219,6 +248,20 @@ void LocationConfig::print_status_for_debug(std::string prefix)  // TODO : remov
 		std::cout << i->first << ":" << i->second << "  ";
 	}
 	std::cout << std::endl;
+
+	std::cout << prefix;
+	std::cout << "limit_except : ";
+	for (std::set<std::string>::iterator i = this->limit_except.begin(); i != this->limit_except.end(); i++){
+		std::cout << *i << " ";
+	}
+	std::cout << std::endl;
+
 	std::cout << prefix;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;	
+}
+
+
+const std::set<std::string>& LocationConfig::getLimitExcept(void) const // TODO : remove
+{
+	return this->limit_except;	
 }

@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/25 13:48:51 by kycho             #+#    #+#             */
-/*   Updated: 2021/07/07 00:43:09 by kycho            ###   ########.fr       */
+/*   Updated: 2021/07/07 19:57:50 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <vector>
 # include <map>
+# include <set>
 # include <string>
 
 # include "ServerConfig.hpp"
@@ -33,13 +34,13 @@ private:
 	unsigned long				client_max_body_size;
 	std::map<int, std::string>	error_page;
 	//return
-	// limit_except
+	std::set<std::string>		limit_except;
 
 public:
 	LocationConfig(std::vector<std::string> tokens, ServerConfig* server_config);
 	~LocationConfig(void);
 
-	bool								isPrefixMatchUri(std::string request_uri);
+	bool								checkPrefixMatchUri(std::string request_uri);
 
 	const std::string&					getUri(void) const;
 	const std::string&					getRoot(void) const;
@@ -47,9 +48,12 @@ public:
 	const bool&							getAutoindex(void) const;
 	const unsigned long&				getClientMaxBodySize(void) const;
 	const std::map<int, std::string>&	getErrorPage(void) const;
+
+	bool								checkAcceptedMethod(const std::string request_method) const;
 	
 	// for debug
 	void print_status_for_debug(std::string prefix);  // TODO : remove
+	const std::set<std::string>&		getLimitExcept(void) const; // TODO : remove
 };
 
 #endif
