@@ -4,18 +4,22 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2)
-		return (1);
+	if (argc <= 2)
+	{
+		std::string		config_file_name;
+		config_file_name = ((argc == 1) ? "sample.conf" : argv[1]);
 
-	Cycle cycle;
-	try {
-		HttpConfig *httpconfig = new HttpConfig(argv[1]);
-		cycle.init_cycle(httpconfig);
+		try {
+			HttpConfig *httpconfig = new HttpConfig(config_file_name);
+			Cycle cycle(httpconfig);
+
+			cycle.webservCycle();
+			delete httpconfig;
+		}
+		catch(std::exception &e) {
+			std::cerr << e.what() << std::endl;
+			return (-1);
+		}
 	}
-	catch(std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		return (-1);
-	}
-	cycle.webserv_cycle();
 	return (0);
 }

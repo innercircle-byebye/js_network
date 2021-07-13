@@ -6,7 +6,7 @@
 
 class Logger {
 public:
-	static void	log_error(int level, const char *fmt, ...) {
+	static void	logError(int level, const char *fmt, ...) {
 		std::stringstream	ss;
 		std::ofstream		ofs;
 

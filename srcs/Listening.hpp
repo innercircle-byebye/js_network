@@ -2,33 +2,34 @@
 #define LISTENING_HPP
 
 #include "webserv.hpp"
-#include "SocketManager.hpp"
 #include "Connection.hpp"
 
 class Listening {
 private:
-	socket_t			fd;
+	socket_t			fd_;
 
-	struct sockaddr_in	sockaddr;
-	socklen_t			socklen;
-	std::string			addr_text;
+	struct sockaddr_in	sockaddr_;
+	socklen_t			socklen_;
+	std::string			addr_text_;
 
-	int					type;
-	int					backlog;
+	int					type_;
+	int					backlog_;
 
-	Connection			*connection;
+	Connection			*connection_;
 
 public:
-	Listening(in_port_t _port, in_addr_t _ipaddr);
+	Listening(in_port_t port, in_addr_t ipaddr);
 	~Listening();
 
-	void		open_listening_socket(SocketManager *sm);
+	void		setSocketFd();
+	void		bindSocket();
+	void		listenSocket();
 
-	void		set_listening_connection(Connection *c);
+	void		setListeningConnection(Connection *c);
 
-	Connection	*get_listening_connection() const;
-	socket_t	get_fd() const;
-	const std::string	&get_addr_text() const;
+	Connection	*getListeningConnection() const;
+	socket_t	getFd() const;
+	const std::string	&getAddrText() const;
 };
 
 #endif

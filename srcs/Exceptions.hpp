@@ -1,67 +1,67 @@
 #ifndef EXCEPTION_HPP
 #define EXCEPTION_HPP
 
-class webservCycleException: public std::exception {
+class WebservCycleException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("Webserv cycle error happen.");
 	}
 };
 
-class kqueueException: public std::exception {
+class KqueueException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("kqueue() error.");
 	}
 };
 
-class keventException: public std::exception {
+class KeventException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("kqueue() error.");
 	}
 };
 
-class socketException: public std::exception {
+class SocketException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("socket() error.");
 	}
 };
 
-class bindException: public std::exception {
+class BindException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("bind() error.");
 	}
 };
 
-class listenException: public std::exception {
+class ListenException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("listen() error.");
 	}
 };
 
-class nonblockingException: public std::exception {
+class NonblockingException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("nonblocking() error.");
 	}
 };
 
-class acceptExcception: public std::exception {
+class AcceptExcception: public std::exception {
 	virtual const char *what() const throw() {
 		return ("accept() error.");
 	}
 };
 
-class connNotEnoughException: public std::exception {
+class ConnNotEnoughException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("connection not enough error.");
 	}
 };
 
-class closeSocketException: public std::exception {
+class CloseSocketException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("connection not enough error.");
 	}
 };
 
-class fileOpenException: public std::exception {
+class FileOpenException: public std::exception {
 	virtual const char *what() const throw() {
 		return ("file open error.");
 	}
