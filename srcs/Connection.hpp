@@ -2,54 +2,56 @@
 #define CONNECTION_HPP
 
 #include "webserv.hpp"
+#include "SocketManager.hpp"
 #include "Listening.hpp"
 #include "HttpConfig.hpp"
-#include "Request_Message.hpp"
+#include "RequestMessage.hpp"
+#include "Logger.hpp"
 
 class Connection {
 private:
-	bool				listen;
+	bool				listen_;
 
-	socket_t			fd;
-	int					type;
-	struct sockaddr_in	sockaddr;		// client의 port랑 ip
-	socklen_t			socklen;
+	socket_t			fd_;
+	int					type_;
+	struct sockaddr_in	client_sockaddr_;		// client의 port랑 ip
+	socklen_t			client_socklen_;
 
-	Listening			*listening;
-	struct sockaddr_in	local_sockaddr;	// local_sockaddr.sin_port == 5000
-	socklen_t			local_socklen;
+	Listening			*listening_;
+	struct sockaddr_in	server_sockaddr_;	// local_sockaddr.sin_port == 5000
+	socklen_t			server_socklen_;
 
-	HttpConfig			*httpconfig;
+	HttpConfig			*httpconfig_;
 
-	Request_Message		req_msg;
-	Connection			*next;
+	RequestMessage		req_msg_;
+	Connection			*next_;
 
 public:
-	char				buffer[BUF_SIZE];
+	char				buffer_[BUF_SIZE];
 
 	Connection();
 	~Connection();
 
-	Connection	*event_accept(SocketManager *sv);
+	Connection	*eventAccept(SocketManager *sv);
 
-	void	set_listen(bool _listen);
-	void	set_next(Connection *_next);
-	void	set_fd(socket_t _fd);
-	void	set_type(int _type);
-	void	set_listening(Listening *_listening);
-	void	set_sockaddr(struct sockaddr_in *sa, socklen_t sl);
-	void	set_local_sockaddr(struct sockaddr_in *sa, socklen_t sl);
-	void	set_httpconfig(HttpConfig *&hc);
-	void	set_request_message(Request_Message &req_msg);
+	void	setListen(bool listen);
+	void	setNext(Connection *next);
+	void	setFd(socket_t fd);
+	void	setType(int type);
+	void	setListening(Listening *listening);
+	void	setClientSockaddr(struct sockaddr_in *client_sockaddr, socklen_t client_socklen);
+	void	setServerSockaddr(struct sockaddr_in *server_sockaddr, socklen_t server_socklen);
+	void	setHttpConfig(HttpConfig *httpconfig);
+	void	setRequestMessage(RequestMessage &req_msg);
 
-	bool				get_listen() const;
-	Connection			*get_next() const;
-	socket_t			get_fd() const;
-	struct sockaddr_in	get_local_sockaddr() const;
-	// const HttpConfig	*get_httpconfig() const;
-	// const Request_Message		&get_request_message() const;
-	HttpConfig	*get_httpconfig();
-	Request_Message		&get_request_message();
+	bool				getListen() const;
+	Connection			*getNext() const;
+	socket_t			getFd() const;
+	struct sockaddr_in	getServerSockaddr() const;
+	// const HttpConfig	*getHttpConfig() const;
+	// const RequestMessage		&getRequestMessage() const;
+	HttpConfig	*getHttpConfig();
+	RequestMessage		&getRequestMessage();
 };
 
 

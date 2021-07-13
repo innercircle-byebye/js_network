@@ -8,15 +8,14 @@
 
 class Cycle {
 private:
-	SocketManager	*sm;
-	Kqueue			*kq;
+	Kqueue			*kq_;
+	SocketManager	*sm_;
 
 public:
-	Cycle();
+	Cycle(HttpConfig *httpconfig);
 	~Cycle();
 
-	void	init_cycle(HttpConfig *&httpconfig);
-	void	webserv_cycle();
+	void	webservCycle();
 };
 
 #endif

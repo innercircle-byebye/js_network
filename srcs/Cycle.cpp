@@ -1,30 +1,30 @@
 #include "Cycle.hpp"
 
-Cycle::Cycle() {
-	std::ofstream ofs;
-	ofs.open("error.log", std::ofstream::out | std::ios_base::app);
+Cycle::Cycle(HttpConfig *httpconfig) {
+	// error.log 생성
+	std::ofstream ofs("error.log");
 	if (!ofs.is_open())
-		throw fileOpenException();
+		throw FileOpenException();
 	ofs.close();
-	kq = new Kqueue();
-	sm = new SocketManager();
+
+	kq_ = new Kqueue();
+	sm_ = new SocketManager(httpconfig);
 }
 
 Cycle::~Cycle() {
-	delete kq;
-	delete sm;
+	delete kq_;
+	delete sm_;
 }
 
-void	Cycle::init_cycle(HttpConfig *&httpconfig) {
-	kq->kqueue_init();
-	sm->init_socket_manager(httpconfig);
-	sm->open_listening_sockets(kq);
-}
+void	Cycle::webservCycle() {
+	// 생성한 listening socket들 kqueue에 ADD
+	for (size_t i = 0; i < sm_->getListeningSize(); ++i) {
+		kq_->kqueueSetEvent(sm_->getListening()[i]->getListeningConnection(), EVFILT_READ, EV_ADD);
+	}
 
-void	Cycle::webserv_cycle() {
 	for ( ;; ) {
 		try {
-			kq->kqueue_process_events(sm);
+			kq_->kqueueProcessEvents(sm_);
 		}
 		catch(std::exception &e) {
 			std::cerr << e.what() << std::endl;

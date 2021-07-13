@@ -1,110 +1,106 @@
 #include "SocketManager.hpp"
 
-SocketManager::SocketManager()
-{}
-
-SocketManager::~SocketManager()
+SocketManager::SocketManager(HttpConfig *httpconfig)
 {
-	close_listening_sockets();
-	delete[] connections;
-}
-
-void	SocketManager::init_socket_manager(HttpConfig *&httpconfig)
-{
-	// listening socket들 할당
 	std::multimap<in_port_t, in_addr_t> addrs = httpconfig->getMustListens();
 	for(std::multimap<in_port_t, in_addr_t>::iterator it = addrs.begin(); it != addrs.end(); ++it) {
 		Listening *ls = new Listening(it->first, it->second);
-		listening.push_back(ls);
+		listening_.push_back(ls);
 	}
 
 	//connection socket들 할당
-	connection_n = DEFAULT_CONNECTIONS;
-	connections = new Connection[connection_n]();
-	Connection *c = connections;
+	connection_n_ = DEFAULT_CONNECTIONS;
+	connections_ = new Connection[connection_n_]();
+	Connection *c = connections_;
 	Connection *next = NULL;
-	for (int_t i = connection_n - 1; i >= 0; --i) {
-		c[i].set_next(next);
-		c[i].set_fd(-1);
-		c[i].set_httpconfig(httpconfig);
+	for (int i = connection_n_ - 1; i >= 0; --i) {
+		c[i].setNext(next);
+		c[i].setFd(-1);
+		c[i].setHttpConfig(httpconfig);
 		next = &c[i];
 	}
-	free_connections = next;
-	free_connection_n = connection_n;
+	free_connections_ = next;
+	free_connection_n_ = connection_n_;
+
+	openListeningSockets();
 }
 
-void	SocketManager::open_listening_sockets(Kqueue* &kq) {
-	for (size_t i = 0; i < listening.size(); ++i) {
+SocketManager::~SocketManager()
+{
+	closeListeningSockets();
+	delete[] connections_;
+}
+
+void	SocketManager::openListeningSockets() {
+	for (size_t i = 0; i < listening_.size(); ++i) {
 		try {
-			listening[i]->open_listening_socket(this);
-			kq->kqueue_set_event(listening[i]->get_listening_connection(), EVFILT_READ, EV_ADD);
+			listening_[i]->setSocketFd();
+			listening_[i]->bindSocket();
+			listening_[i]->listenSocket();
+			listening_[i]->setListeningConnection(getConnection(listening_[i]->getFd()));
 		}
 		catch(std::exception &e) {
-			std::cerr << "SocketManager::open_listening_sockets(fd = " << listening[i]->get_fd() << ")" 
+			std::cerr << "SocketManager::open_listening_sockets(fd = " << listening_[i]->getFd() << ")" 
 						<< e.what() << std::endl;
 		}
 	}
 }
 
-void	SocketManager::close_listening_sockets() {
+void	SocketManager::closeListeningSockets() {
 
-	for(size_t i = 0; i < listening.size(); ++i) {
-		Listening	*ls = listening[i];
-		Connection	*c = ls->get_listening_connection();
+	for(size_t i = 0; i < listening_.size(); ++i) {
+		Listening	*ls = listening_[i];
+		Connection	*c = ls->getListeningConnection();
 
 		if (c) {
-			free_connection(c);
-			ls->set_listening_connection(NULL);
+			freeConnection(c);
+			ls->setListeningConnection(NULL);
 		}
-		if (close_socket(ls->get_fd()) == -1) {
-			Logger::log_error(LOG_EMERG, "close() socket %s failed", ls->get_addr_text().c_str());
-			throw closeSocketException();
+		if (closeSocket(ls->getFd()) == -1) {
+			Logger::logError(LOG_EMERG, "close() socket %s failed", ls->getAddrText().c_str());
+			throw CloseSocketException();
 		}
 		delete ls;
 	}
 }
 
 // free_connections에 있는 connection 하나 return
-Connection*		SocketManager::get_connection(socket_t s) {
+Connection*		SocketManager::getConnection(socket_t s) {
 	Connection *c;
 
-	c = free_connections;
+	c = free_connections_;
 	if (c == NULL) {
-		Logger::log_error(LOG_ALERT, "%u worker_connections are not enough", connection_n);
-		throw connNotEnoughException();
+		Logger::logError(LOG_ALERT, "%u worker_connections are not enough", connection_n_);
+		throw ConnNotEnoughException();
 	}
-	free_connections = c->get_next();
-	--free_connection_n;
-	c->set_fd(s);
+	free_connections_ = c->getNext();
+	--free_connection_n_;
+	c->setFd(s);
 	return c;
 }
 
-void	SocketManager::free_connection(Connection *c) {
-	c->set_next(free_connections);
-	free_connections = c;
-	++free_connection_n;
+void	SocketManager::freeConnection(Connection *c) {
+	c->setNext(free_connections_);
+	free_connections_ = c;
+	++free_connection_n_;
 }
 
-void	SocketManager::close_connection(Connection *c) {
+void	SocketManager::closeConnection(Connection *c) {
 	socket_t	fd;
 
-	free_connection(c);
-	fd = c->get_fd();
-	c->set_fd(-1);
-	if (close_socket(fd) == -1) {
-		Logger::log_error(LOG_ALERT, "close() socket %d failed", fd);
-		throw closeSocketException();
+	freeConnection(c);
+	fd = c->getFd();
+	c->setFd(-1);
+	if (closeSocket(fd) == -1) {
+		Logger::logError(LOG_ALERT, "close() socket %d failed", fd);
+		throw CloseSocketException();
 	}
 }
 
-const std::vector<Listening*>	&SocketManager::get_listening() const {
-	return listening;
+const std::vector<Listening*>	&SocketManager::getListening() const {
+	return listening_;
 }
 
-size_t	SocketManager::get_listening_size() const {
-	return listening.size();
-}
-
-Connection	*SocketManager::get_connections() const {
-	return connections;
+size_t	SocketManager::getListeningSize() const {
+	return listening_.size();
 }

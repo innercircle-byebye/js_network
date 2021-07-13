@@ -2,7 +2,6 @@
 #define SOCKETMANAGER_HPP
 
 #include "webserv.hpp"
-#include "Kqueue.hpp"
 #include "Listening.hpp"
 #include "Connection.hpp"
 #include "Logger.hpp"
@@ -10,29 +9,26 @@
 
 class SocketManager {
 private:
-	std::vector<Listening*>		listening;
+	std::vector<Listening*>		listening_;
 
-	Connection	*connections;
-	size_t		connection_n;
-	Connection	*free_connections;
-	size_t		free_connection_n;
+	Connection	*connections_;
+	size_t		connection_n_;
+	Connection	*free_connections_;
+	size_t		free_connection_n_;
+
+	void		openListeningSockets();
+	void		closeListeningSockets();
 
 public:
-	SocketManager();
+	SocketManager(HttpConfig *httpconfig);
 	~SocketManager();
 
-	void		init_socket_manager(HttpConfig *&httpconfig);
+	Connection*	getConnection(socket_t s);
+	void		freeConnection(Connection *c);
+	void		closeConnection(Connection *c);
 
-	void		open_listening_sockets(Kqueue* &kq);
-	void		close_listening_sockets();
-
-	Connection*	get_connection(socket_t s);
-	void		free_connection(Connection *c);
-	void		close_connection(Connection *c);
-
-	const std::vector<Listening*>	&get_listening() const;
-	size_t		get_listening_size() const;
-	Connection	*get_connections() const;
+	const std::vector<Listening*>	&getListening() const;
+	size_t		getListeningSize() const;
 };
 
 #endif

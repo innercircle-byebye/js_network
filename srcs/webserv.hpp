@@ -17,15 +17,13 @@
 #include "Exceptions.hpp"
 
 typedef	int					socket_t;
-typedef intptr_t			int_t;
-typedef uintptr_t			uint_t;
 typedef u_short				in_port_t;
 
 #define DEFAULT_CONNECTIONS	512
 #define LISTEN_BACKLOG		511
 #define BUF_SIZE			30000
 #define nonblocking(s)		fcntl(s, F_SETFL, O_NONBLOCK)
-#define close_socket		close
+#define closeSocket			close
 
 #define WEBSERV_CONTINUE	1
 #define WEBSERV_OK			0
