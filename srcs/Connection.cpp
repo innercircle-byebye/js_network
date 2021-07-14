@@ -12,7 +12,7 @@ Connection::~Connection() {}
 // listen == true 일때 호출됨
 Connection	*Connection::eventAccept(SocketManager *sm) {
 	struct sockaddr_in	sockaddr;
-	socklen_t			socklen;
+	socklen_t			socklen = sizeof(struct sockaddr_in);
 
 	socket_t s = accept(fd_, (struct sockaddr *)&sockaddr, &socklen);
 

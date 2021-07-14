@@ -17,7 +17,6 @@
 #include "Exceptions.hpp"
 
 typedef	int					socket_t;
-typedef u_short				in_port_t;
 
 #define DEFAULT_CONNECTIONS	512
 #define LISTEN_BACKLOG		511
