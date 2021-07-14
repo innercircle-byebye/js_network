@@ -72,15 +72,14 @@ void	Kqueue::kqueue_process_events(SocketManager *sm)
 			Logger::log_error(LOG_ALERT, "%d kevent() error on %d filter:%d", events, (int)event_list[i].ident, (int)event_list[i].filter);
 			continue ;
 		}
-		if (event_list[i].flags & EV_EOF) {
-			Logger::log_error(LOG_ALERT, "%d kevent() reported about an closed connection %d", events, (int)event_list[i].ident);
-			kqueue_set_event(c, EVFILT_READ, EV_DELETE);
-			sm->close_connection(c);	// throw
-		}
 		else if (event_list[i].filter == EVFILT_READ) {
 			if (c->get_listen()) {
 				Connection *conn = c->event_accept(sm);	// throw
 				kqueue_set_event(conn, EVFILT_READ, EV_ADD);
+			}
+			else if (event_list[i].flags & EV_EOF) {
+				Logger::log_error(LOG_ALERT, "%d kevent() reported about an closed connection %d", events, (int)event_list[i].ident);
+				sm->close_connection(c);
 			}
 			else {
 				recv_len = recv(event_list[i].ident, c->buffer, BUF_SIZE, 0);
