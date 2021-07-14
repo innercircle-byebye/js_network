@@ -1,11 +1,12 @@
 #include "Cycle.hpp"
 
 Cycle::Cycle(HttpConfig *httpconfig) {
-	// error.log 생성
-	std::ofstream ofs("error.log");
-	if (!ofs.is_open())
-		throw FileOpenException();
-	ofs.close();
+	if (access("error.log", F_OK) == -1) {
+		std::ofstream ofs("error.log");
+		if (!ofs.is_open())
+			throw FileOpenException();
+		ofs.close();
+	}
 
 	kq_ = new Kqueue();
 	sm_ = new SocketManager(httpconfig);
