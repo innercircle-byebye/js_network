@@ -3,6 +3,7 @@
 Connection::Connection()
 : listen_(false), fd_(-1), type_(SOCK_STREAM), listening_(NULL)
 {
+	sockaddr_to_connect_.sin_family = AF_INET;
 	memset(buffer_, 0, BUF_SIZE);
 }
 
@@ -10,10 +11,10 @@ Connection::~Connection() {}
 
 // listen == true 일때 호출됨
 Connection	*Connection::eventAccept(SocketManager *sm) {
-	struct sockaddr_in	conn_sockaddr;
-	socklen_t			conn_socklen;
+	struct sockaddr_in	sockaddr;
+	socklen_t			socklen;
 
-	socket_t s = accept(fd_, (struct sockaddr *)&conn_sockaddr, &conn_socklen);
+	socket_t s = accept(fd_, (struct sockaddr *)&sockaddr, &socklen);
 
 	if (s == -1) {
 		Logger::logError(LOG_ALERT, "accept() failed");
@@ -36,8 +37,8 @@ Connection	*Connection::eventAccept(SocketManager *sm) {
 	}
 
 	c->setListening(listening_);
-	c->setClientSockaddr(&conn_sockaddr, conn_socklen);
-	c->setServerSockaddr(&server_sockaddr_, server_socklen_);
+	c->setSockaddrToConnectPort(sockaddr_to_connect_.sin_port);
+	c->setSockaddrToConnectIP(sockaddr.sin_addr.s_addr);
 	return c;
 }
 
@@ -57,17 +58,11 @@ void	Connection::setType(int type)
 void	Connection::setListening(Listening *listening)
 { listening_ = listening; }
 
-void	Connection::setClientSockaddr(struct sockaddr_in *client_sockaddr, socklen_t client_socklen)
-{
-	client_socklen_ = client_socklen;
-	memcpy(&client_sockaddr_, client_sockaddr, client_socklen);
-}
+void	Connection::setSockaddrToConnectPort(in_port_t port)
+{ sockaddr_to_connect_.sin_port = port;}
 
-void	Connection::setServerSockaddr(struct sockaddr_in *server_sockaddr, socklen_t server_socklen)
-{
-	server_socklen_ = server_socklen;
-	memcpy(&server_sockaddr_, server_sockaddr, server_socklen);
-}
+void	Connection::setSockaddrToConnectIP(in_addr_t ipaddr)
+{ sockaddr_to_connect_.sin_addr.s_addr = ipaddr; }
 
 void	Connection::setHttpConfig(HttpConfig *httpconfig)
 { httpconfig_ = httpconfig; }
@@ -89,12 +84,11 @@ const RequestMessage		&Connection::getRequestMessage() const
 { return req_msg; }
 */
 
-
-struct sockaddr_in	Connection::getServerSockaddr() const
-{ return server_sockaddr_; }
-
 HttpConfig	*Connection::getHttpConfig()
 { return httpconfig_; }
 
 RequestMessage		&Connection::getRequestMessage()
 { return req_msg_; }
+
+struct sockaddr_in	Connection::getSockaddrToConnect()
+{ return sockaddr_to_connect_; }

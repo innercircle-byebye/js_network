@@ -14,12 +14,10 @@ private:
 
 	socket_t			fd_;
 	int					type_;
-	struct sockaddr_in	client_sockaddr_;		// client의 port랑 ip
-	socklen_t			client_socklen_;
+	struct sockaddr_in	sockaddr_to_connect_;
+	socklen_t			socklen_to_connect_;
 
 	Listening			*listening_;
-	struct sockaddr_in	server_sockaddr_;	// local_sockaddr.sin_port == 5000
-	socklen_t			server_socklen_;
 
 	HttpConfig			*httpconfig_;
 
@@ -39,8 +37,8 @@ public:
 	void	setFd(socket_t fd);
 	void	setType(int type);
 	void	setListening(Listening *listening);
-	void	setClientSockaddr(struct sockaddr_in *client_sockaddr, socklen_t client_socklen);
-	void	setServerSockaddr(struct sockaddr_in *server_sockaddr, socklen_t server_socklen);
+	void	setSockaddrToConnectPort(in_port_t port);
+	void	setSockaddrToConnectIP(in_addr_t ipaddr);
 	void	setHttpConfig(HttpConfig *httpconfig);
 	void	setRequestMessage(RequestMessage &req_msg);
 
@@ -50,8 +48,9 @@ public:
 	struct sockaddr_in	getServerSockaddr() const;
 	// const HttpConfig	*getHttpConfig() const;
 	// const RequestMessage		&getRequestMessage() const;
-	HttpConfig	*getHttpConfig();
+	HttpConfig			*getHttpConfig();
 	RequestMessage		&getRequestMessage();
+	struct sockaddr_in	getSockaddrToConnect();
 };
 
 

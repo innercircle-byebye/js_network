@@ -9,10 +9,12 @@ Listening::Listening(in_port_t port, in_addr_t ipaddr)
 
 	socklen_ = sizeof(sockaddr_);
 
-	// u_char	*p = (u_char *)&sockaddr_.sin_addr;
-	// addr_text_ += ntohs(sockaddr_.sin_port);
-	// setting해야함
-	addr_text_ = "";
+	std::stringstream ss;
+	char buf[32] = {0,};
+	ss << inet_ntop(AF_INET, &ipaddr, buf, sizeof(buf));
+	ss << ":";
+	ss << ntohs(port);
+	addr_text_ = ss.str();
 }
 
 Listening::~Listening() {}
@@ -56,8 +58,8 @@ void		Listening::setListeningConnection(Connection *c) {
 	c->setListen(true);
 	c->setType(type_);
 	c->setListening(this);
-	c->setClientSockaddr(&sockaddr_, socklen_);
-	c->setServerSockaddr(&sockaddr_, socklen_);
+	c->setSockaddrToConnectPort(sockaddr_.sin_port);
+	c->setSockaddrToConnectIP(sockaddr_.sin_addr.s_addr);
 	connection_ = c;
 }
 

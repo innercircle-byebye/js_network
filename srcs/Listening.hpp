@@ -3,6 +3,7 @@
 
 #include "webserv.hpp"
 #include "Connection.hpp"
+#include <arpa/inet.h>
 
 class Listening {
 private:
